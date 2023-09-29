@@ -58,7 +58,7 @@ const SignUp = ({ navigation }) => {
     }, [])
 
     const formValidation = () => {
-        if (fullname == '' || phonenumber == '' || address == '' || email == '' || password == '' || cpassword == '') return false
+        if (fullname == '' || email == '' || password == '' || cpassword == '') return false
         else return true
     }
 
@@ -79,8 +79,8 @@ const SignUp = ({ navigation }) => {
     const signup_details = async () => {
         const article = {
             fullname: fullname,
-            address: address,
-            phonenumber: phonenumber,
+            address: address || '-',
+            phonenumber: phonenumber || '-',
             email: email,
             password: password,
 
@@ -151,7 +151,7 @@ const SignUp = ({ navigation }) => {
             setspinner(false)
             // Alert.alert("Please provide all the feilds.")
             setModalVisible(true)
-            setDynamicModalText("Please provide all the feilds.")
+            setDynamicModalText("Please provide all the required feilds with *")
 
         }
 
@@ -207,8 +207,7 @@ const SignUp = ({ navigation }) => {
                         />
 
                     </View>
-                    <View style={{ marginBottom: 25 }}>
-                        {/* <Text style={styles.formTitle}>Complaint Title</Text> */}
+                    {/* <View style={{ marginBottom: 25 }}>
                         <TextInput
                             style={styles.inputBox}
                             keyboardType='number-pad'
@@ -219,14 +218,13 @@ const SignUp = ({ navigation }) => {
 
                     </View>
                     <View style={{ marginBottom: 25 }}>
-                        {/* <Text style={styles.formTitle}>Complaint Title</Text> */}
                         <TextInput
                             style={styles.inputBox}
                             placeholder={strings.address}
                             onChangeText={(value) => setaddress(value)}
                         />
 
-                    </View>
+                    </View> */}
                     <View style={{ marginBottom: 25 }}>
                         {/* <Text style={styles.formTitle}>Complaint Title</Text> */}
                         <TextInput

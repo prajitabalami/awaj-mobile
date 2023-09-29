@@ -42,12 +42,12 @@ export default {
     signup: "Signup",
     forgot: "Forgot Password?",
     login: "Login",
-    fullname: "Full Name",
+    fullname: "Full Name*",
     number: "Phone Number",
-    email: "Email Address",
-    password: "Password",
+    email: "Email Address*",
+    password: "Password*",
     address: "Address",
-    cpassword:"Comfirm Password",
+    cpassword:"Comfirm Password*",
     choose: "Choose an option",
     chooseArea: "Choose Area"
 

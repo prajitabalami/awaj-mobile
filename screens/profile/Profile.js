@@ -34,6 +34,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import CustomModalButtons from '../components/CustomModalButtons';
 import CustomModal from '../components/CustomModal';
+import CustomModalDelete from '../components/CustomModalDelete';
 
 const Profile = ({ navigation }) => {
     const [open, setOpen] = useState(false);
@@ -53,6 +54,8 @@ const Profile = ({ navigation }) => {
     const [modalVisible2, setModalVisible2] = useState(false);
     const [dynamicModalText2, setDynamicModalText2] = useState('')
     const [modalVisible, setModalVisible] = useState(false);
+    const [modalVisible3, setModalVisible3] = useState(false);
+    const [modalText3, setModalText3] = useState(false);
     const [dynamicModalText, setDynamicModalText] = useState('')
     const [refreshing, setRefreshing] = React.useState(false);
     const [userId, setUserId] = useState('')
@@ -65,10 +68,28 @@ const Profile = ({ navigation }) => {
     const handleModal2 = () => {
         setModalVisible2(!modalVisible2)
     }
+    const handleModal3 = () => {
+        setModalVisible3(!modalVisible3)
+    }
 
     const handleYes = () => {
         logout()
         handleModal2()
+    }
+
+    const handleYes3 = async() =>{
+     
+        try {
+            const data = await axios.delete(BaseUrl.BaseUrl + 'delete_account/' + userId);
+            console.log("Delete response", data.data)
+            logout()
+        }
+        catch (err) {
+            console.log(err)
+            setModalVisible(true)
+            setDynamicModalText("Something went wrong. Please check your Internet Connection!")
+        }
+
     }
 
     const fetchData = async() => {
@@ -226,6 +247,7 @@ const Profile = ({ navigation }) => {
                 <CustomModal visible={modalVisible} modalText={dynamicModalText} onClose={handleModal} />
 
                 <CustomModalButtons visible={modalVisible2} modalText={dynamicModalText2} onClickedNo={handleModal2} onClickedYes={handleYes} />
+                <CustomModalDelete visible={modalVisible3} modalText={modalText3} onClickedNo={handleModal3} onClickedYes={handleYes3} />
 
 
                 <View style={styles.profileContainer}>
@@ -237,24 +259,24 @@ const Profile = ({ navigation }) => {
                                     <FontAwesome name='user' size={25} />
 
                                 </View>
-                                <View>
+                               
 
                                     <Text style={styles.profileName}>{profDetails.fullname}</Text>
-                                    <Text style={styles.detailsText}>{profDetails.address}</Text>
-                                </View>
+                                
+                                <View style={{position:'absolute', right:0}}>
+                            <TouchableOpacity
+                            style={{backgroundColor:'red', padding:10, opacity:0.7, borderRadius:5}}
+                            onPress={()=>{
+                                setModalText3('Are you sure you want to delete your account and all data?')
+                                handleModal3()
+                            }}
+                            >
+                                <Text style={{color:'white'}}>Remove Account</Text>
+                            </TouchableOpacity>
+                        </View>
                             </View>
 
                             <View style={styles.profileDetails}>
-                                <View style={{ ...styles.iconContainer, marginTop: 10 }}>
-                                    <FontAwesome name='phone' size={20} color='grey' />
-                                    <Text style={styles.detailsText}>{profDetails.phonenumber}</Text>
-                                </View>
-
-                                {/* <View style={{ ...styles.iconContainer, marginTop: 10 }}>
-                                    <MaterialCommunityIcons name='map-marker-radius' size={20} color='grey' />
-                                    <Text style={styles.detailsText}>{profDetails.address}</Text>
-                                </View> */}
-
                                 <View style={{ ...styles.iconContainer, marginTop: 10 }}>
                                     <Ionicons name='mail' size={20} color='grey' />
                                     <Text style={styles.detailsText}>{profDetails.email}</Text>
@@ -381,7 +403,7 @@ const styles = StyleSheet.create({
 
     },
     profileDetails: {
-        marginTop: 20,
+        marginTop: 10,
         marginLeft: 10
     },
     detailsText: {

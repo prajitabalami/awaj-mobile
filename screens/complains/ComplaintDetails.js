@@ -6,9 +6,8 @@ import {
     StyleSheet,
     Text,
     useColorScheme,
-    View, Image, Button, FlatList, TextInput, Alert, TouchableOpacity, Dimensions
+    View, Image, Button, Linking, TextInput, Alert, TouchableOpacity, Dimensions
 } from 'react-native';
-
 
 
 import { ThemeColor } from '../../ThemeColor'
@@ -18,6 +17,7 @@ import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons'
 import Octicons from 'react-native-vector-icons/Octicons'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import CustomModalButtons from '../components/CustomModalButtons'
 
 
 const windowWidth = Dimensions.get("window").width;
@@ -40,6 +40,8 @@ const CommentItem = ({ comment, currUserId, complaintId, updateList }) => {
     const handleReplyPress = () => {
         setShowReplyInput(!showReplyInput);
     };
+
+   
 
     const handleReplySubmit = async (parentId) => {
         const article = {
@@ -177,6 +179,7 @@ const ComplaintDetails = ({ navigation, route }) => {
         { label: 'Pending', value: 'Pending' },
         { label: 'Queue', value: 'Queue' },
     ]);
+    const [visible,setIsVisible] = useState(false)
 
     const [progressAmount, setProgressAmount] = useState(0)
 
@@ -194,22 +197,23 @@ const ComplaintDetails = ({ navigation, route }) => {
     const [curruserName, setCurrUserName] = useState('')
     const [selectedRepIndex, setSelectedRepIndex] = useState(null)
     const [currEmail, setCurrEmail] = useState('')
+    const [reportComment, setReportComment] = useState('')
 
 
 
     useEffect(() => {
-        let isMounted =true;
+        let isMounted = true;
         const list = route.params.items;
         setDetails(list);
-        if(isMounted){
+        if (isMounted) {
             getDetails(callApi);
             getCurrId();
         }
-       
 
-         return () => {
+
+        return () => {
             isMounted = false
-         };
+        };
     }, []);
 
     const getCurrId = async () => {
@@ -392,10 +396,42 @@ const ComplaintDetails = ({ navigation, route }) => {
 
     }
 
+    const handleReport = async() => {
+        let config = {
+            headers: {
+
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+
+            }
+        }
+        console.log(BaseUrl.BaseUrl + 'reportComment/' + currUserId + '/'+ complaintId+ '/'+ reportComment)
+
+        try {
+            const data = await axios.get(BaseUrl.BaseUrl + 'reportComment/' + currUserId + '/'+ complaintId+ '/'+ reportComment, config);
+            console.log("Response", data.data)
+            handleModal()
+            
+
+        } catch (error) {
+            console.log("Error", error);
+            handleModal()
+        }
+    }
+
+    const handleModal=()=>{
+        setIsVisible(!visible)
+    }
+
 
     return (
         <View style={{ backgroundColor: ThemeColor.backgroundLight, paddingVertical: 20 }} >
             <ScrollView>
+                <CustomModalButtons visible={visible} modalText='Do you want to report the comment?'
+                onClickedNo={()=>handleModal()}
+                onClickedYes={handleReport}
+                />
                 <TouchableOpacity
                     onPress={() => navigation.navigate('LatestComplaints')}
                     style={{
@@ -587,16 +623,31 @@ const ComplaintDetails = ({ navigation, route }) => {
                                                 )}
 
                                                 <Text style={{ opacity: 0.9, marginTop: 5 }}>{item.message}</Text>
-                                                {((item.userid && item.userid._id === currUserId) || currEmail === "sachiwalayap@gmail.com") && (
+                                                <View style={{flexDirection:'row', marginTop:5}}>
+
+                                                    {((item.userid && item.userid._id === currUserId) || currEmail === "sachiwalayap@gmail.com") && (
+                                                        <View style={{marginRight:15}}>
+                                                            <TouchableOpacity
+                                                                onPress={() => {
+                                                                    handleReplyPress()
+                                                                    setSelectedRepIndex(key)
+                                                                }}
+                                                            >
+                                                                <Text style={{ fontWeight: '600', marginVertical: 5 }}>Reply</Text>
+                                                            </TouchableOpacity>
+
+                                                        </View>
+                                                    )}
                                                     <TouchableOpacity
-                                                        onPress={() => {
-                                                            handleReplyPress()
-                                                            setSelectedRepIndex(key)
-                                                        }}
+                                                    onPress={()=>{
+                                                        handleModal()
+                                                        setReportComment(item._id)
+                                                    }}
                                                     >
-                                                        <Text style={{ fontWeight: '600', marginVertical: 5 }}>Reply</Text>
+                                                        <Text style={{ fontWeight: '600', marginVertical: 5 }}>Report</Text>
                                                     </TouchableOpacity>
-                                                )}
+                                                </View>
+
                                                 {showReplyInput && selectedRepIndex === key && (
                                                     <View>
                                                         <TextInput
